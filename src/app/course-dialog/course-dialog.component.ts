@@ -15,7 +15,7 @@ import {CoursesStore} from '../services/courses.store';
     LoadingService,
     MessagesService
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false
 })
 export class CourseDialogComponent {
