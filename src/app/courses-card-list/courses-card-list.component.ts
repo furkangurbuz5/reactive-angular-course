@@ -17,7 +17,7 @@ export class CoursesCardListComponent {
   private readonly dialog = inject(MatDialog);
 
   editCourse(course: Course): void {
-    const dialogConfig = this.createCourseDialog(course);
+    const dialogConfig = this.createCourseDialogConfig(course);
 
     const dialogRef = this.dialog.open(CourseDialogComponent, dialogConfig);
 
@@ -29,7 +29,7 @@ export class CoursesCardListComponent {
       .subscribe();
   }
 
-  private createCourseDialog(data: Course): MatDialogConfig {
+  private createCourseDialogConfig(data: Course): MatDialogConfig {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.disableClose = false;
