@@ -15,20 +15,20 @@ export class CoursesStore {
   private readonly loading = inject(LoadingService);
   private readonly messages = inject(MessagesService);
 
-  private readonly subject = new BehaviorSubject<Course[]>([]);
-  courses$: Observable<Course[]> = this.subject.asObservable();
+  private readonly coursesSubject = new BehaviorSubject<Course[]>([]);
+  courses$: Observable<Course[]> = this.coursesSubject.asObservable();
 
   constructor() {
     this.loadAllCourses();
   }
 
   saveCourse(courseId: string, changes: Partial<Course>): Observable<Course> {
-    const newCourses: Course[] = this.subject.getValue()
+    const newCourses: Course[] = this.coursesSubject.getValue()
       .map((course: Course): Course => {
         return (course.id === courseId) ? { ...course, ...changes } : course;
       });
 
-    this.subject.next(newCourses);
+    this.coursesSubject.next(newCourses);
 
     return this.http.put<Course>(`/api/courses/${courseId}`, changes)
       .pipe(
@@ -62,7 +62,7 @@ export class CoursesStore {
           console.log(message, err);
           return throwError(err);
         }),
-        tap(courses => this.subject.next(courses))
+        tap(courses => this.coursesSubject.next(courses))
       );
 
     this.loading.showLoaderUntilCompleted(loadCourses$)
