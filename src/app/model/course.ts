@@ -1,3 +1,6 @@
+export interface CourseResponse{
+  payload: Course[];
+}
 
 export interface Course {
   id: string;
