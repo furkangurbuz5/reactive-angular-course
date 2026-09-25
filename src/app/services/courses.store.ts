@@ -66,5 +66,4 @@ export class CoursesStore {
     this.loading.showLoaderUntilCompleted(loadCourses$)
       .subscribe();
   }
-
 }
