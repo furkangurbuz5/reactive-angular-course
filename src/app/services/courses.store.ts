@@ -1,84 +1,81 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, throwError} from 'rxjs';
 import {Course, CourseResponse, sortCoursesBySeqNo} from '../model/course';
 import {catchError, map, shareReplay, tap} from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {LoadingService} from '../loading/loading.service';
 import {MessagesService} from '../messages/messages.service';
 
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class CoursesStore {
+  private readonly http = inject(HttpClient);
+  private readonly loading = inject(LoadingService);
+  private readonly messages = inject(MessagesService);
 
-    private subject = new BehaviorSubject<Course[]>([]);
+  private subject = new BehaviorSubject<Course[]>([]);
+  courses$: Observable<Course[]> = this.subject.asObservable();
 
-    courses$ : Observable<Course[]> = this.subject.asObservable();
+  constructor() {
+    this.loadAllCourses();
+  }
 
-    constructor(
-        private http:HttpClient,
-        private loading: LoadingService,
-        private messages: MessagesService) {
+  saveCourse(courseId: string, changes: Partial<Course>): Observable<any> {
 
-        this.loadAllCourses();
+    const courses = this.subject.getValue();
 
-    }
+    const index = courses.findIndex(course => course.id == courseId);
 
-    private loadAllCourses() {
-        const loadCourses$ = this.http.get<CourseResponse>('/api/courses')
-            .pipe(
-                map(response => response.payload),
-                catchError(err => {
-                    const message = "Could not load courses";
-                    this.messages.showErrors(message);
-                    console.log(message, err);
-                    return throwError(err);
-                }),
-                tap(courses => this.subject.next(courses))
-            );
+    const newCourse: Course = {
+      ...courses[index],
+      ...changes
+    };
 
-        this.loading.showLoaderUntilCompleted(loadCourses$)
-            .subscribe();
-    }
+    const newCourses: Course[] = courses.slice(0);
 
-    saveCourse(courseId:string, changes: Partial<Course>): Observable<any> {
+    newCourses[index] = newCourse;
 
-        const courses = this.subject.getValue();
+    this.subject.next(newCourses);
 
-        const index = courses.findIndex(course => course.id == courseId);
+    return this.http.put(`/api/courses/${courseId}`, changes)
+      .pipe(
+        catchError(err => {
+          const message = "Could not save course";
+          console.log(message, err);
+          this.messages.showErrors(message);
+          return throwError(err);
+        }),
+        shareReplay()
+      );
+  }
 
-        const newCourse: Course = {
-          ...courses[index],
-          ...changes
-        };
+  filterByCategory(category: string): Observable<Course[]> {
+    return this.courses$
+      .pipe(
+        map(courses =>
+          courses.filter(course => course.category == category)
+            .sort(sortCoursesBySeqNo)
+        )
+      )
+  }
 
-        const newCourses: Course[] = courses.slice(0);
+  private loadAllCourses() {
+    const loadCourses$ = this.http.get<CourseResponse>('/api/courses')
+      .pipe(
+        map(response => response.payload),
+        catchError(err => {
+          const message = "Could not load courses";
+          this.messages.showErrors(message);
+          console.log(message, err);
+          return throwError(err);
+        }),
+        tap(courses => this.subject.next(courses))
+      );
 
-        newCourses[index] = newCourse;
-
-        this.subject.next(newCourses);
-
-        return this.http.put(`/api/courses/${courseId}`, changes)
-            .pipe(
-                catchError(err => {
-                    const message = "Could not save course";
-                    console.log(message, err);
-                    this.messages.showErrors(message);
-                    return throwError(err);
-                }),
-                shareReplay()
-            );
-    }
-
-    filterByCategory(category: string): Observable<Course[]> {
-        return this.courses$
-            .pipe(
-                map(courses =>
-                    courses.filter(course => course.category == category)
-                        .sort(sortCoursesBySeqNo)
-                )
-            )
-    }
+    this.loading.showLoaderUntilCompleted(loadCourses$)
+      .subscribe();
+  }
 
 }
