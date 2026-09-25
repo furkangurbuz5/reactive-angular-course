@@ -12,9 +12,9 @@ import {filter, tap} from 'rxjs/operators';
   standalone: false
 })
 export class CoursesCardListComponent {
-  readonly courses = input.required<Course[]>();
+  public readonly courses = input.required<Course[]>();
+  public readonly coursesChanged = output<void>();
   private readonly dialog = inject(MatDialog);
-  private coursesChanged = output<void>();
 
   editCourse(course: Course) {
     const dialogConfig = new MatDialogConfig();
