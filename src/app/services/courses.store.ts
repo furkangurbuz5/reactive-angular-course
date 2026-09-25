@@ -22,7 +22,7 @@ export class CoursesStore {
     this.loadAllCourses();
   }
 
-  saveCourse(courseId: string, changes: Partial<Course>): Observable<void> {
+  saveCourse(courseId: string, changes: Partial<Course>): Observable<Course> {
     const newCourses: Course[] = this.subject.getValue()
       .map((course: Course): Course => {
         return (course.id === courseId) ? { ...course, ...changes } : course;
@@ -30,7 +30,7 @@ export class CoursesStore {
 
     this.subject.next(newCourses);
 
-    return this.http.put<void>(`/api/courses/${courseId}`, changes)
+    return this.http.put<Course>(`/api/courses/${courseId}`, changes)
       .pipe(
         catchError(err => {
           const message = "Could not save course";
