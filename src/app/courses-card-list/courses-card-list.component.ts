@@ -16,14 +16,8 @@ export class CoursesCardListComponent {
   public readonly coursesChanged = output<void>();
   private readonly dialog = inject(MatDialog);
 
-  editCourse(course: Course) {
-    const dialogConfig = new MatDialogConfig();
-
-    dialogConfig.disableClose = true;
-    dialogConfig.autoFocus = true;
-    dialogConfig.width = "400px";
-
-    dialogConfig.data = course;
+  editCourse(course: Course): void {
+    const dialogConfig = this.createCourseDialog(course);
 
     const dialogRef = this.dialog.open(CourseDialogComponent, dialogConfig);
 
@@ -33,5 +27,16 @@ export class CoursesCardListComponent {
         tap(() => this.coursesChanged.emit())
       )
       .subscribe();
+  }
+
+  private createCourseDialog(data: Course): MatDialogConfig {
+    const dialogConfig = new MatDialogConfig();
+
+    dialogConfig.disableClose = false;
+    dialogConfig.autoFocus = 'dialog';
+    dialogConfig.width = "400px";
+    dialogConfig.data = data;
+
+    return dialogConfig;
   }
 }
