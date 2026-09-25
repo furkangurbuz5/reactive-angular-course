@@ -1,10 +1,10 @@
-@for (course of courses; track course) {
+@for (course of courses(); track course) {
   <mat-card
     class="course-card mat-elevation-z7">
     <mat-card-header>
       <mat-card-title>{{course.description}}</mat-card-title>
     </mat-card-header>
-    <img mat-card-image [src]="course.iconUrl">
+    <img mat-card-image [src]="course.iconUrl" alt="">
     <mat-card-content>
       <p>{{course.longDescription}}</p>
     </mat-card-content>
