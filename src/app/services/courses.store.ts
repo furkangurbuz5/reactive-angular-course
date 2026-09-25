@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {BehaviorSubject, Observable, throwError} from 'rxjs';
 import {Course, CourseResponse, sortCoursesBySeqNo} from '../model/course';
 import {catchError, map, shareReplay, tap} from 'rxjs/operators';
@@ -7,9 +7,7 @@ import {LoadingService} from '../loading/loading.service';
 import {MessagesService} from '../messages/messages.service';
 
 
-@Injectable({
-  providedIn: 'root'
-})
+@Service()
 export class CoursesStore {
   private readonly http = inject(HttpClient);
   private readonly loading = inject(LoadingService);
