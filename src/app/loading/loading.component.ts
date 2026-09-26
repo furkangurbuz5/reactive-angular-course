@@ -1,24 +1,13 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import {Observable} from 'rxjs';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {LoadingService} from './loading.service';
 
 @Component({
-    selector: 'loading',
-    templateUrl: './loading.component.html',
-    styleUrls: ['./loading.component.css'],
-    changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+  selector: 'loading',
+  templateUrl: './loading.component.html',
+  styleUrls: ['./loading.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
-export class LoadingComponent implements OnInit {
-
-
-  constructor(public loadingService: LoadingService) {
-
-  }
-
-  ngOnInit() {
-
-  }
-
-
+export class LoadingComponent {
+  protected readonly loadingService = inject(LoadingService);
 }
