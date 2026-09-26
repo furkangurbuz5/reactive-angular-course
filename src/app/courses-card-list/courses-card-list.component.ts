@@ -19,7 +19,7 @@ export class CoursesCardListComponent {
   editCourse(course: Course): void {
     const dialogConfig = this.createCourseDialogConfig(course);
 
-    const dialogRef = this.dialog.open(CourseDialogComponent, dialogConfig);
+    const dialogRef = this.dialog.open<CourseDialogComponent, Course, Course>(CourseDialogComponent, dialogConfig);
 
     dialogRef.afterClosed()
       .pipe(
@@ -29,8 +29,8 @@ export class CoursesCardListComponent {
       .subscribe();
   }
 
-  private createCourseDialogConfig(data: Course): MatDialogConfig {
-    const dialogConfig = new MatDialogConfig();
+  private createCourseDialogConfig(data: Course): MatDialogConfig<Course> {
+    const dialogConfig = new MatDialogConfig<Course>();
 
     dialogConfig.disableClose = false;
     dialogConfig.autoFocus = 'dialog';
