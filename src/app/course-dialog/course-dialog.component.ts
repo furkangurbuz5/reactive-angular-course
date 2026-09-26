@@ -32,7 +32,7 @@ export class CourseDialogComponent {
   private messagesService = inject(MessagesService);
 
   save() {
-    const changes = this.form.value;
+    const changes: Partial<Course> = this.form.value;
     this.coursesStore.saveCourse(this.course.id, changes)
       .subscribe();
     this.dialogRef.close(changes);
