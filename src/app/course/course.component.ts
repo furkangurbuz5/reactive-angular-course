@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {CourseData} from '../model/course';
-import {map, startWith, tap} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 import {combineLatest, Observable} from 'rxjs';
 import {CoursesService} from '../services/courses.service';
 
@@ -24,10 +24,7 @@ export class CourseComponent implements OnInit {
   private getCourseData(): void {
     const courseId = parseInt(this.route.snapshot.paramMap.get("courseId"));
     const course$ = this.coursesService.loadCourseById(courseId);
-    const lessons$ = this.coursesService.loadAllCourseLessons(courseId)
-      .pipe(
-        startWith([])
-      );
+    const lessons$ = this.coursesService.loadAllCourseLessons(courseId);
     this.data$ = combineLatest([course$, lessons$])
       .pipe(
         map(([course, lessons]) => {
