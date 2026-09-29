@@ -1,29 +1,34 @@
-import {inject, Service} from '@angular/core';
-import {BehaviorSubject, Observable, throwError} from 'rxjs';
+import {inject, OnDestroy, Service} from '@angular/core';
+import {BehaviorSubject, Observable, Subject, throwError} from 'rxjs';
 import {Course, CourseResponse, sortCoursesBySeqNo} from '../model/course';
-import {catchError, map, shareReplay, tap} from 'rxjs/operators';
+import {catchError, map, shareReplay, takeUntil, tap} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {LoadingService} from '../loading/loading.service';
 import {MessagesService} from '../messages/messages.service';
 
-
 @Service()
-export class CoursesStore {
+export class CoursesStore implements OnDestroy {
   private readonly http = inject(HttpClient);
   private readonly loading = inject(LoadingService);
   private readonly messages = inject(MessagesService);
 
   private readonly coursesSubject = new BehaviorSubject<Course[]>([]);
   courses$: Observable<Course[]> = this.coursesSubject.asObservable();
+  private readonly destroy$ = new Subject<void>();
 
   constructor() {
     this.loadAllCourses();
   }
 
-  saveCourse(courseId: string, changes: Partial<Course>): Observable<Course> {
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  public saveCourse(courseId: string, changes: Partial<Course>): Observable<Course> {
     const newCourses: Course[] = this.coursesSubject.getValue()
       .map((course: Course): Course => {
-        return (course.id === courseId) ? { ...course, ...changes } : course;
+        return (course.id === courseId) ? {...course, ...changes} : course;
       });
 
     this.coursesSubject.next(newCourses);
@@ -40,11 +45,11 @@ export class CoursesStore {
       );
   }
 
-  filterByCategory(category: string): Observable<Course[]> {
+  public filterByCategory(category: string): Observable<Course[]> {
     return this.courses$
       .pipe(
         map(courses =>
-          courses.filter(course => course.category == category)
+          courses.filter(course => course.category === category)
             .sort(sortCoursesBySeqNo)
         )
       )
@@ -64,6 +69,7 @@ export class CoursesStore {
       );
 
     this.loading.showLoaderUntilCompleted(loadCourses$)
+      .pipe(takeUntil(this.destroy$))
       .subscribe();
   }
 }
