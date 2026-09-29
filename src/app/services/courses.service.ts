@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {Course} from '../model/course';
 import {Observable} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
-import {Lesson} from '../model/lesson';
+import {Lesson, LessonResponse} from '../model/lesson';
 
 @Service()
 export class CoursesService {
@@ -45,14 +45,14 @@ export class CoursesService {
   }
 
   searchLessons(search: string): Observable<Lesson[]> {
-    return this.http.get<Lesson[]>('/api/lessons', {
+    return this.http.get<LessonResponse>('/api/lessons', {
       params: {
         filter: search,
         pageSize: "100"
       }
     })
       .pipe(
-        map(res => res["payload"]),
+        map((response): Lesson[] => response.payload),
         shareReplay()
       );
   }

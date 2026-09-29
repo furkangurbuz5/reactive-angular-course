@@ -1,4 +1,6 @@
-
+export interface LessonResponse {
+  payload: Lesson[]
+}
 
 export interface Lesson {
     id: number;
